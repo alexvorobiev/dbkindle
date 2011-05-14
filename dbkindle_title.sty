@@ -1,0 +1,26 @@
+% see documentation for memoir class
+
+\makechapterstyle{centered}{%
+  \chapterstyle{default}
+  \setlength{\beforechapskip}{5\onelineskip}
+  \renewcommand*{\printchaptername}{}
+  \renewcommand*{\chapternamenum}{}
+  \renewcommand*{\chapnumfont}{\normalfont\large}
+  \settoheight{\midchapskip}{\chapnumfont 1}
+  \renewcommand*{\printchapternum}{\centering \chapnumfont
+     \thechapter\
+    }
+  \renewcommand*{\afterchapternum}{\par\nobreak\vskip 0.5\onelineskip}
+  \renewcommand*{\printchapternonum}{\centering
+                 \vphantom{\chapnumfont 1}\afterchapternum}
+  \renewcommand*{\chaptitlefont}{\normalfont\Large}
+  \renewcommand*{\printchaptertitle}[1]{\centering \chaptitlefont ##1
+    \par\nobreak\vskip 0.5\onelineskip
+    %    \Pisymbol{MinionPro-Extra}{110}
+    \Pisymbol{MinionPro-Extra}{120}
+    %    \textxswup
+  }
+  \setlength{\afterchapskip}{2.5\onelineskip}}
+
+\chapterstyle{centered}
+%\renewcommand*{\chaptitlefont}{\fontfamily{antt}\fontshape{bf}\selectfont}

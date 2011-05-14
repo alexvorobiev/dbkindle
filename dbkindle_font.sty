@@ -1,0 +1,45 @@
+% Font setup
+ 
+%Adobe Minion Pro
+\usepackage[minionint,opticals,fullfamily,footnotefigures]{MinionPro}
+\usepackage{MnSymbol} 
+\figureversion{text,proportional}
+
+% Make sure words with ligatures are searchable in PDF
+\input glyphtounicode
+\pdfgentounicode=1
+
+
+%% % PsCyr
+%% \usepackage{PsCyr}
+%% \renewcommand{\rmdefault}{faq}
+
+%% % Fontogroup
+%% \usepackage{fontogr}
+%% \renewcommand{\rmdefault}{scb}
+
+%% % New Century Schoolbook Cyrillic (http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=16#1)
+%% \renewcommand{\rmdefault}{lnc}
+%% \renewcommand{\normalsize}{\fontsize{19}{20}\selectfont}
+
+% No cyrillic!
+%\usepackage{tgpagella}
+
+
+% Microtypography enhancements. This is font-specific because not every font/encoding combination
+% supports both protrusion and expansion. See documentation for microtype for details.
+
+%\PassOptionsToPackage{kerning=true, spacing=true, babel=true, protrusion=true, expansion=true}{microtype}
+
+\usepackage[kerning=true, spacing=true, babel=true, protrusion=true, expansion=true]{microtype}
+%\usepackage[kerning=true, spacing=true, babel=true, protrusion=true, expansion=false]{microtype}
+
+% adjusts the size and spacing of titles and lists. Savetrees loads microtype. Conflicts with memoir's chapter styles
+%\usepackage[normalmargins]{savetrees}
+
+% Dropped capitals
+\usepackage{lettrine}
+% Font for the dropped capitals
+%% \renewcommand{\LettrineFontHook}{\fontfamily{antt}\fontshape{b}%
+%% }
+

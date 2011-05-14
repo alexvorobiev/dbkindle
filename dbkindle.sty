@@ -1,0 +1,216 @@
+%%
+%% This is a DocBook LaTeX style example
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{dbkindle}[2011/04/06 DocBook Style for Kindle]
+
+% The defined options required by dblatex
+\DeclareOption{hyperlink}{ \def\DBKhyperlink{yes} }
+\DeclareOption{nohyperlink}{ \def\DBKhyperlink{no} }
+
+% Default values
+\ExecuteOptions{hyperlink}
+
+% If defined, process the options
+\ProcessOptions\relax
+
+
+% Needed packages
+\usepackage{float}
+
+%%%%%%%%%%%%%%%%% memoir needs modifications in dbk_core %%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{dbk_core}
+
+%
+% Basic core definitions used for DocBook
+%
+\usepackage{graphicx}
+\usepackage{ifthen}
+\usepackage{subfig}
+\usepackage{enumitem}
+\usepackage{footmisc}
+
+%
+% These <bookinfo|articleinfo> parameters must be defined
+%
+\newcommand{\DBKreference}{}                % mapped to <pubsnumber>
+\newcommand{\DBKsite}{}                     % mapped to <bookinfo/address>
+\newcommand{\DBKdate}{\today}               % mapped to <bookinfo/date>
+\newcommand{\DBKreleaseinfo}{Working Paper} % mapped to <releaseinfo>
+\newcommand{\DBKedition}{}                  % mapped to <edition>
+\newcommand{\DBKsubtitle}{}                 % mapped to <subtitle>
+\newcommand{\DBKpubdate}{}                  % mapped to <pubdate>
+\newcommand{\DBKcopyright}{}                % mapped to <copyright>
+\newcommand{\DBKlegalblock}{}               % mapped to <legalnotice> stuff
+\newcommand{\DBKlegaltitle}{}               % idem
+
+% Main latex <othercredit> command. It will be redefined by the XSL stylesheets.
+\newcommand{\DBKindexation}{}
+
+% Watermark command
+\def\showwatermark#1{}
+
+% Front/main/back matter macros
+\@ifundefined{frontmatter}{ \let\frontmatter\relax }{}
+\@ifundefined{mainmatter}{ \let\mainmatter\relax }{}
+\@ifundefined{backmatter}{ \let\backmatter\relax }{}
+
+
+%
+% Main latex <revhistory> command. It will be redefined by the XSL stylesheets.
+%
+\newcommand{\DBKrevhistory}{}
+
+\usepackage{dbk_fonts}
+\usepackage{dbkindle_hyper}
+\usepackage{dbk_biblio}
+\usepackage{dbk_table}
+\usepackage{dbk_graphic}
+\usepackage{dbk_verbatim}
+\usepackage{dbk_callout}
+\usepackage{dbk_locale}
+\usepackage{dbk_annot}
+% Beware with changebar and AtEndDocument!
+\usepackage{dbk_changebar}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% end of dbk_core
+
+% LaTeX <othercredit> commands to define
+%
+% #1: mapped to <contrib>
+% #2: mapped to <firstname> <surname>
+%
+\def\DBKinditem#1#2{
+  #2  & #1 \tabularnewline
+  \hline
+}
+
+\newenvironment{DBKindtable}{
+  \begin{tabular}{ |l|l| }
+  \hline
+  \emph{Collaborator} & \emph{Contribution}
+  \hline
+}{
+  \end{tabular}
+}
+
+%
+% Latex <revhistory> table
+%
+\newenvironment{DBKrevtable}{
+  \begin{longtable}{ |l|l|l|l| }
+  \hline
+  Revision number & Date & Release Info & Author \tabularnewline
+  \hline
+  \endhead
+}{
+  \end{longtable}
+}
+
+%
+% <legalnotice> environment skip the information
+%
+\newenvironment{DBKlegalnotice}{
+}{
+}
+
+%
+% These floats must be defined to map <example> and <equation>
+%
+%\usepackage{float}
+
+\floatstyle{ruled}
+\newfloat{example}{ht}{loe}[section]
+\floatname{example}{Example}
+
+\floatstyle{plain}
+\newfloat{dbequation}{ht}{loe}[section]
+\floatname{dbequation}{{\scshape Equation }}
+
+%
+% Nothing special for <note>, <caution>, <warning>
+%
+\newenvironment{DBKadmonition}[2] {
+}{
+}
+
+%% OBSOLETE, memoir takes care of that
+%% % force correct positioning of partially full pages by placing invisible (light gray) dots into page corners
+%% \usepackage[width=85.09mm, height=111.76mm, center]{crop}
+
+%% \usepackage[pdftex]{pict2e}
+
+%% \newcommand*\cornerCrop{% 
+%%   \begin{picture}(0,0)
+%%     \unitlength1pt
+%%     \put(0,0){\color{light-gray}\circle*{1}}
+%% \end{picture}}
+
+%% \cropdef\cornerCrop\cornerCrop\cornerCrop\cornerCrop{cornerDots}
+%% \crop[cornerDots]
+
+% Configure screen's geometry in that file
+\usepackage{dbkindle_geometry}
+
+% Use [fixed] in case of margin errrors
+%\checkandfixthelayout[fixed]
+\checkandfixthelayout
+
+\definecolor{light-gray}{gray}{0.95}
+\renewcommand*{\trimmarkscolor}{\color{light-gray}}
+
+% font
+\usepackage{dbkindle_font}
+
+% reduces amount of hyphenations but makes paragraphs less pretty.
+% On the other hand without this you’ll get text running off the right side of the screen sometimes.
+%\sloppy
+
+% no header/footer
+\pagestyle{empty}
+\aliaspagestyle{chapter}{empty}
+\aliaspagestyle{part}{empty}
+
+% omit words Chapter, Part etc and their numbering
+\setcounter{part}{-1}
+\setcounter{chapter}{-1}
+
+\renewcommand{\chaptername}{}
+\renewcommand{\partname}{}
+
+\renewcommand{\thechapter}{}
+\renewcommand{\thepart}{}
+\renewcommand{\thesection}{}
+
+% babel requires different approach to turn non-english words for chapter, part, etc off
+\ifdefined\addto %
+  \addto\captionsrussian{%
+    \def\chaptername{}%
+    \def\partname{}%
+  }%
+\fi
+
+
+% Fancy chapter titles
+%\usepackage[Sonny]{fncychap}
+
+% Fancy breaks
+% Lists of available symbols: 
+% http://willbenton.com/wb-images/pifont.pdf
+% http://mirror.unl.edu/ctan/fonts/fourier-GUT/doc/latex/fourier/fourier-orns.pdf
+\usepackage{fourier-orns}
+\renewcommand{\pfbreakdisplay}{%
+  \decofourright\quad\decofourright\quad\decofourright}
+
+\usepackage{footnote} % To deal with footnotes in e.g. epigraphs
+\usepackage{calc}
+
+% Epigraphs
+\setlength{\epigraphrule}{0pt}
+\setlength{\beforeepigraphskip}{0pt}
+\setlength{\afterepigraphskip}{0pt}
+\setlength{\epigraphwidth}{\stockwidth * 3 / 4}
+\epigraphfontsize{\footnotesize}
+
+\usepackage{dbkindle_unicode}
+\usepackage{dbkindle_title}
+

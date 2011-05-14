@@ -1,0 +1,90 @@
+% Greek letters in unicode
+\usepackage[noenc]{tipa}
+\usepackage{textcomp}
+%small letters
+%% \renewcommand\textalpha{\ensuremath{\alpha}}
+%% \renewcommand\textbeta{\ensuremath{\beta}}
+%% \renewcommand\textgamma{\ensuremath{\gamma}}
+%% \renewcommand\textdelta{\ensuremath{\delta}}
+%% \renewcommand\textpi{\ensuremath{\pi}}
+%% %capital letters
+%% \renewcommand\textAlpha{\ensuremath{\Alpha}}
+%% \renewcommand\textBeta{\ensuremath{\Beta}}
+%% \renewcommand\textGamma{\ensuremath{\Gamma}}
+%% \renewcommand\textDelta{\ensuremath{\Delta}}
+%% \renewcommand\textPi{\ensuremath{\Pi}}
+
+\usepackage{textgreek}
+% MikTeX has older version of the textgreek so the fixes are needed
+\DeclareTextGreekSymbol{omicron}{o}
+\DeclareTextGreekSymbol{Omicron}{O}
+\DeclareTextGreekSymbol{varsigma}{c}
+
+% weird ``house'' character
+\DeclareInputText{127}{}
+
+% Unicode characters not covered by utf8x
+\DeclareUnicodeCharacter{8213}{\textemdash}
+\DeclareUnicodeCharacter{8209}{-} % FIXME non-breaking hyphen :)
+
+% Fractions
+%\DeclareUnicodeCharacter{8531}{${1\over 3}$}
+%\DeclareUnicodeCharacter{8532}{${2\over 3}$}
+
+%% \@ifundefined{slantfrac}{%
+%%   \def\slantfrac#1#2{${#1\over#2}$}%
+%%   }
+
+\@ifundefined{slantfrac}{%
+  \usepackage{xfrac}
+  \def\slantfrac#1#2{\sfrac{#1}{#2}}%
+}
+
+\DeclareUnicodeCharacter{8531}{\slantfrac{1}{3}}
+\DeclareUnicodeCharacter{8532}{\slantfrac{2}{3}}
+\DeclareUnicodeCharacter{8533}{\slantfrac{1}{5}}
+\DeclareUnicodeCharacter{8534}{\slantfrac{2}{5}}
+\DeclareUnicodeCharacter{8535}{\slantfrac{3}{5}}
+\DeclareUnicodeCharacter{8536}{\slantfrac{4}{5}}
+\DeclareUnicodeCharacter{8537}{\slantfrac{1}{6}}
+\DeclareUnicodeCharacter{8538}{\slantfrac{5}{6}}
+\DeclareUnicodeCharacter{8539}{\slantfrac{1}{8}}
+\DeclareUnicodeCharacter{8540}{\slantfrac{3}{8}}
+\DeclareUnicodeCharacter{8541}{\slantfrac{5}{8}}
+\DeclareUnicodeCharacter{8542}{\slantfrac{7}{8}}
+
+
+
+
+
+% Wrong OCR, has to be U+2220
+\DeclareUnicodeCharacter{64430}{$\angle$}
+
+% FIX these two (combining aphostrophes - used to show accents) in params.xml
+\DeclareUnicodeCharacter{768}{\`{}}
+\DeclareUnicodeCharacter{769}{\'{}}
+
+% Phonetic alphabet
+\DeclareUnicodeCharacter{240}{{\tipaencoding D}}
+\DeclareUnicodeCharacter{254}{{\tipaencoding \th}}
+\DeclareUnicodeCharacter{331}{{\tipaencoding N}}
+\DeclareUnicodeCharacter{222}{{\tipaencoding \th}}
+\DeclareUnicodeCharacter{518}{\textroundcap{E}}
+
+% Old Russian letters
+
+\let\saveCYRYAT\CYRYAT % save old definition to prevent recursion
+\renewcommand\CYRYAT{\fontencoding{OT2}\selectfont\saveCYRYAT}
+\let\saveCYRFITA\CYRFITA
+\renewcommand\CYRFITA{\fontencoding{OT2}\selectfont\saveCYRFITA}
+\let\saveCYRIZH\CYRIZH
+\renewcommand\CYRIZH{\fontencoding{OT2}\selectfont\saveCYRIZH}
+\let\savecyryat\cyryat
+\renewcommand\cyryat{\fontencoding{OT2}\selectfont\savecyryat}
+\let\savecyrfita\cyrfita
+\renewcommand\cyrfita{\fontencoding{OT2}\selectfont\savecyrfita}
+\let\savecyrizh\cyrizh
+\renewcommand\cyrizh{\fontencoding{OT2}\selectfont\savecyrizh}
+
+
+
