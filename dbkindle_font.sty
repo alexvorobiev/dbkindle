@@ -10,20 +10,53 @@
 \pdfgentounicode=1
 
 
-%% % PsCyr
+% PsCyr
+% AcademyPSCyr, AntiquaPSCyr, etc
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=11#1
 %% \usepackage{PsCyr}
 %% \renewcommand{\rmdefault}{faq}
 
-%% % Fontogroup
+% Fontogroup
+% Many fonts, see sample in the archive
+% http://herba.msu.ru/shipunov/software/tex/fontogroup.zip
 %% \usepackage{fontogr}
+% Schoolbook
 %% \renewcommand{\rmdefault}{scb}
 
-%% % New Century Schoolbook Cyrillic (http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=16#1)
-%% \renewcommand{\rmdefault}{lnc}
-%% \renewcommand{\normalsize}{\fontsize{19}{20}\selectfont}
+% WFonts (standard Windows fonts)
+% Georgia, Arial, Palatino, Times New Roman
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=13#1
+%\usepackage{GeorgiaW}
+
+% URWCyr
+% URW Bookman L, Century Schoolbook L, URW Palladio L, Nimbus Roman No9 L, URW Gothic L, Nimbus Sans L
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=24#1
+% URW Bookman
+%\renewcommand{\rmdefault}{ubk}
+
+% Linotype Sabon
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=1040
+%\usepackage[garamond]{mathdesign} 
+
+% New century schoolbook
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=16#1
+%\usepackage{fouriernc}
+
+% PFonts
+% 19 fonts including Academy, Cooper, Lazurski, Baltica, Quant Antiqua with support for scaling
+% http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=12#1
+% Academy
+%\usepackage[scaled=1.20]{AcademyP}
+
+% Cooper
+%\usepackage{CooperP}
 
 % No cyrillic!
+% Enhanced Palatino
 %\usepackage{tgpagella}
+
+% Dayroman http://ctan.mackichan.com/fonts/DayRoman/readme.dayroman
+%\renewcommand*\rmdefault{dayrom}
 
 
 % Microtypography enhancements. This is font-specific because not every font/encoding combination
@@ -32,10 +65,11 @@
 %\PassOptionsToPackage{kerning=true, spacing=true, babel=true, protrusion=true, expansion=true}{microtype}
 
 \usepackage[kerning=true, spacing=true, babel=true, protrusion=true, expansion=true]{microtype}
+% Some fonts (don't use them!) do not support expansion
 %\usepackage[kerning=true, spacing=true, babel=true, protrusion=true, expansion=false]{microtype}
 
-% adjusts the size and spacing of titles and lists. Savetrees loads microtype. Conflicts with memoir's chapter styles
-%\usepackage[normalmargins]{savetrees}
+% One more way to adjust font size and distance between lines
+%% \renewcommand{\normalsize}{\fontsize{19}{20}\selectfont}
 
 % Dropped capitals
 \usepackage{lettrine}
