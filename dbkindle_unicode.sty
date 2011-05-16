@@ -53,10 +53,6 @@
 \DeclareUnicodeCharacter{8541}{\slantfrac{5}{8}}
 \DeclareUnicodeCharacter{8542}{\slantfrac{7}{8}}
 
-
-
-
-
 % Wrong OCR, has to be U+2220
 \DeclareUnicodeCharacter{64430}{$\angle$}
 
@@ -86,5 +82,18 @@
 \let\savecyrizh\cyrizh
 \renewcommand\cyrizh{\fontencoding{OT2}\selectfont\savecyrizh}
 
+% Some control characters
+
+\DeclareUnicodeCharacter{150}{}
+\DeclareUnicodeCharacter{151}{}
+\DeclareUnicodeCharacter{152}{}
+\DeclareUnicodeCharacter{153}{}
+\DeclareUnicodeCharacter{154}{}
+\DeclareUnicodeCharacter{155}{}
+
+% General method to process any printable UNICODE symbols - use as last resort if nothing else works -
+% the special font (Libertine) is used
+%\usepackage{libertine}
+%\DeclareUnicodeCharacter{FFFD}{\libertineGlyph{uniFFFD}}
 
 
