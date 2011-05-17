@@ -24,4 +24,7 @@
     <xsl:text>}%&#10;</xsl:text>
   </xsl:template>
 
+  <!-- Don't show the same picture in the abstract -->
+  <xsl:template match="abstract/para[mediaobject]"/>
+
 </xsl:stylesheet>
