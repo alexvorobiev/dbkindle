@@ -4,7 +4,7 @@
                 extension-element-prefixes="exsl"
                 version='1.0'>
 
-  <!-- <xsl:import href="xsl/coverpage.xsl"/> -->
+  <xsl:import href="xsl/coverpage.xsl"/>
   <xsl:import href="xsl/lettrine.xsl"/>
   <xsl:import href="xsl/poem.xsl"/>
   <xsl:import href="xsl/epigraph.xsl"/>
@@ -19,7 +19,7 @@
 
   <xsl:param name="titleabbrev.in.toc">1</xsl:param>
 
-  <!-- Correction for test for xetex which is provided by memoir -->
+  <!-- Correction for test for xetex which is provided by memoir and inclusion of custom coverpage (maketitle must be redefined before standard preamble templates kick in) -->
   <xsl:template name="encode.before.style">
     <xsl:param name="lang"/>
     <xsl:variable name="use-unicode">
@@ -54,6 +54,8 @@
     </xsl:choose>
 
     <xsl:text>\fi&#10;</xsl:text>
+
+    <!-- <xsl:text>\usepackage{dbkindle_coverpage}</xsl:text> -->
   </xsl:template>
 
   <!-- Multi-line titles -->
