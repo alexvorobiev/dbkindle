@@ -22,14 +22,14 @@
                       not(preceding-sibling::*//text()[normalize-space()]) and
                       not(preceding-sibling::text()[normalize-space()])])">
         
-    <xsl:text>\lettrine[lines=2]{</xsl:text>
-    <xsl:call-template name="scape">
-      <xsl:with-param name="string" select="substring(.,1,1)"/>
-    </xsl:call-template>
-    <xsl:text>}{}</xsl:text>
-    <xsl:call-template name="scape">
-      <xsl:with-param name="string" select="substring(.,2)"/>
-    </xsl:call-template>
+        <xsl:text>\lettrine[lines=2]{</xsl:text>
+        <xsl:call-template name="scape">
+          <xsl:with-param name="string" select="substring(.,1,1)"/>
+        </xsl:call-template>
+        <xsl:text>}{}</xsl:text>
+        <xsl:call-template name="scape">
+          <xsl:with-param name="string" select="substring(.,2)"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-imports/>
