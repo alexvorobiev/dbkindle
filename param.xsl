@@ -5,7 +5,7 @@
                 version='1.0'>
 
   <xsl:import href="xsl/coverpage.xsl"/>
-  <xsl:import href="xsl/lettrine.xsl"/>
+  <!-- <xsl:import href="xsl/lettrine.xsl"/> -->
   <xsl:import href="xsl/poem.xsl"/>
   <xsl:import href="xsl/epigraph.xsl"/>
   
@@ -77,4 +77,8 @@
   <!-- Disable generation of \label's since they won't compile if they use unicode symbols -->
   <xsl:template name="label.id"/>
 
+  <!-- In some books footnotes are enclosed in <superscript> which we need to ignore -->
+  <xsl:template match="superscript[footnote]">
+    <xsl:apply-templates select="./node()"/>
+  </xsl:template>
 </xsl:stylesheet>
