@@ -5,7 +5,7 @@
                 version='1.0'>
 
   <xsl:import href="xsl/coverpage.xsl"/>
-  <!-- <xsl:import href="xsl/lettrine.xsl"/> -->
+  <xsl:import href="xsl/lettrine.xsl"/>
   <xsl:import href="xsl/poem.xsl"/>
   <xsl:import href="xsl/epigraph.xsl"/>
   
@@ -50,6 +50,14 @@
         <xsl:text>\usepackage{ucs}&#10;</xsl:text>
         <xsl:text>\usepackage[utf8x]{inputenc}&#10;</xsl:text>
         <xsl:text>\def\hyperparamadd{unicode=true}&#10;</xsl:text>
+
+        <!-- Settings specific for Russian -->
+        <xsl:choose>
+          <xsl:when test="$lang='ru'">
+            <xsl:text>\let\par\russianpar</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+
       </xsl:when>
     </xsl:choose>
 
@@ -70,8 +78,14 @@
   </xsl:template>
 
   <!-- Fancy breaks -->
-  <xsl:template match="bridgehead">
+  <xsl:template match="bridgehead[.='']">
     <xsl:text>\fancybreak{\pfbreakdisplay}</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="bridgehead">
+    <xsl:text>\fancybreak{</xsl:text>
+    <xsl:apply-templates/>
+    <xsl:text>}</xsl:text>
   </xsl:template>
 
   <!-- Disable generation of \label's since they won't compile if they use unicode symbols -->
