@@ -1,0 +1,33 @@
+\usepackage{wrapfig}
+
+\setlength{\intextsep}{0.25\baselineskip}
+
+\newlength{\saveimagewidth}
+\newsavebox{\saveimagebox}
+\newcounter{figurecounter}
+
+% Enclose the image in either wrapfigure of figure environment depending on its (rescaled) width
+% The first parameter is treshold - multiple of textwith, the second parameter is image file name
+\newcommand{\wrapifneeded}[2]{%
+	\savebox{\saveimagebox}{\includegraphics[width=\imgwidth,height=\imgheight,keepaspectratio=true]{#2}}
+	\settowidth{\saveimagewidth}{\usebox{\saveimagebox}}
+
+	\ifdim\saveimagewidth<#1\textwidth
+   		\ifthenelse{\isodd{\value{figurecounter}}}{
+
+			\begin{wrapfigure}{R}{\saveimagewidth}
+				\usebox{\saveimagebox}
+			\end{wrapfigure}
+		}{
+			\begin{wrapfigure}{L}{\saveimagewidth}
+				\usebox{\saveimagebox}
+			\end{wrapfigure}
+        }
+	\else
+		\begin{figure}[h] %
+  			\centering %
+  				\usebox{\saveimagebox}
+		\end{figure}
+	    \fi
+        \stepcounter{figurecounter}
+}

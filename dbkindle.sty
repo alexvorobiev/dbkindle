@@ -156,7 +156,7 @@
 \checkandfixthelayout
 
 \definecolor{light-gray}{gray}{0.95}
-\renewcommand*{\trimmarkscolor}{\color{light-gray}}
+\newcommand*{\trimmarkscolor}{\color{light-gray}}
 
 % font
 \usepackage{dbkindle_font}
@@ -211,8 +211,10 @@
 \setlength{\epigraphwidth}{\stockwidth * 3 / 4}
 \epigraphfontsize{\footnotesize}
 
+\usepackage{footnpag} % reset footnote counter when new page starts
+
 \usepackage{dbkindle_unicode}
 \usepackage{dbkindle_title}
 \usepackage{dbkindle_verbatim}
-
+\usepackage{dbkindle_graphics}
 

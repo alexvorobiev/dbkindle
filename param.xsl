@@ -8,6 +8,7 @@
   <xsl:import href="xsl/lettrine.xsl"/>
   <xsl:import href="xsl/poem.xsl"/>
   <xsl:import href="xsl/epigraph.xsl"/>
+  <xsl:import href="xsl/image.xsl"/>
   
   <!-- Options used for documentclass -->
 
@@ -74,7 +75,9 @@
 
   <!-- Empty <literallayout> is produced by FB2's <emptyline/>-->
   <xsl:template match="literallayout[.='']">
-    <xsl:text>\par \vspace{\baselineskip}</xsl:text>
+    <xsl:if test="not(preceding-sibling::node()[1][name()='mediaobject']) and not(following-sibling::node()[1][name()='mediaobject'])">
+      <xsl:text>\par \vspace{\baselineskip}</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <!-- Fancy breaks -->
