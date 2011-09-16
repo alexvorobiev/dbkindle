@@ -1,9 +1,9 @@
 % Font setup
  
 %Adobe Minion Pro
-\usepackage[minionint,opticals,fullfamily,footnotefigures]{MinionPro}
-\usepackage{MnSymbol} 
-\figureversion{text,proportional}
+%\usepackage[minionint,opticals,fullfamily,footnotefigures]{MinionPro}
+%\usepackage{MnSymbol} 
+%\figureversion{text,proportional}
 
 % Make sure words with ligatures are searchable in PDF
 \input glyphtounicode
@@ -19,9 +19,9 @@
 % Fontogroup
 % Many fonts, see sample in the archive
 % http://herba.msu.ru/shipunov/software/tex/fontogroup.zip
-%% \usepackage{fontogr}
-% Schoolbook
-%% \renewcommand{\rmdefault}{scb}
+%\usepackage{fontogr}
+% Schoolbook (wide ...)
+%\renewcommand{\rmdefault}{scb}
 
 % WFonts (standard Windows fonts)
 % Georgia, Arial, Palatino, Times New Roman
@@ -40,7 +40,8 @@
 
 % New century schoolbook
 % http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=16#1
-%\usepackage{fouriernc}
+% Dont use \usepackage{fouriernc} despite what documentation says
+%\renewcommand{\rmdefault}{lnc}
 
 % PFonts
 % 19 fonts including Academy, Cooper, Lazurski, Baltica, Quant Antiqua with support for scaling
@@ -51,6 +52,12 @@
 % Cooper
 %\usepackage{CooperP}
 
+\usepackage[charter,expert]{mathdesign}
+
+% Libertine
+%\usepackage{libertine}
+%\renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
+
 % No cyrillic!
 % Enhanced Palatino
 %\usepackage{tgpagella}
@@ -58,6 +65,16 @@
 % Dayroman http://ctan.mackichan.com/fonts/DayRoman/readme.dayroman
 %\renewcommand*\rmdefault{dayrom}
 
+% Garamond
+%\usepackage[urw-garamond]{mathdesign}
+
+% Bera
+%\usepackage[scaled]{beraserif}
+
+
+
+% Helps with overfull lines
+\setlength{\emergencystretch}{1.5em}
 
 % Microtypography enhancements. This is font-specific because not every font/encoding combination
 % supports both protrusion and expansion. See documentation for microtype for details.
