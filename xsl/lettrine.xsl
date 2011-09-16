@@ -17,7 +17,7 @@
                        [normalize-space()]">
     <xsl:choose>
       
-      <xsl:when test="(parent::para and position()=1) or
+      <xsl:when test="(parent::para and position()=1 and not(ancestor::*[parent::footnote])) or
                       (ancestor::*[parent::para][
                       not(preceding-sibling::*//text()[normalize-space()]) and
                       not(preceding-sibling::text()[normalize-space()])])">
