@@ -23,3 +23,24 @@
 
 \chapterstyle{centered}
 %\renewcommand*{\chaptitlefont}{\fontfamily{antt}\fontshape{bf}\selectfont}
+
+% sections
+
+% horizontal lines above and under the title
+\newcommand{\ruledsection}[1]{%
+  \noindent%
+  \parbox[t]{\textwidth}{%
+    \hrule\vskip1em
+    \sffamily\Large\bfseries #1\vskip1em%
+    \hrule%
+  }
+}
+
+
+%\setbeforesecskip{1pt}
+\setaftersecskip{0.01\onelineskip}
+\setsecheadstyle{\bfseries}
+
+
+
+
