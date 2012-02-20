@@ -15,13 +15,15 @@
   
   <xsl:template name="coverimage">
     <xsl:param name="image" select="."/>
-    <xsl:text>\renewcommand{\maketitle}{%&#10;</xsl:text>
-    <xsl:text>\begin{titlingpage}&#10;</xsl:text>
-    <xsl:text>\includegraphics[height=\textheight,keepaspectratio=true]{</xsl:text>
-    <xsl:value-of select="$image"/>
-    <xsl:text>}&#10;</xsl:text>
-    <xsl:text>\end{titlingpage}&#10;</xsl:text>
-    <xsl:text>}%&#10;</xsl:text>
+    <xsl:if test="$image">
+      <xsl:text>\renewcommand{\maketitle}{%&#10;</xsl:text>
+      <xsl:text>\begin{titlingpage}&#10;</xsl:text>
+      <xsl:text>\includegraphics[height=\textheight,keepaspectratio=true]{</xsl:text>
+      <xsl:value-of select="$image"/>
+      <xsl:text>}&#10;</xsl:text>
+      <xsl:text>\end{titlingpage}&#10;</xsl:text>
+      <xsl:text>}%&#10;</xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <!-- Don't show the same picture in the abstract -->
