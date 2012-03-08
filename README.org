@@ -26,7 +26,7 @@
 
 ** Using Dblatex and DBKindle with non-docbook files
    The style package was designed initially to use Dblatex as a drop-in replacement for PDF-generation step of FB2DocBook FB2 to PDF convertor. E-books in many formats can be converted to FB2 using [[http://calibre-ebook.com/][Calibre]].
-   - The FB2DokBook homepage http://www.kir666.ru/fb2docbook does not seem to be available, but the most recent version can be downloaded at [[http://goo.gl/zX9zf]]
+   - The FB2DocBook homepage http://www.kir666.ru/fb2docbook does not seem to be available, but the most recent version can be downloaded at [[http://goo.gl/zX9zf]]
    - Use the files in DBKindle's FB2DocBook subdirectory to replace correspondig files in FB2DocBook
    - The configuration files expect to find Dblatex in FB2DocBook/dblatex, edit configs/dblatex.template and configs/dblatex.cmd.template to reflect your setup
    - Run confsetup.exe to generate various scripts and a configuration file out of templates
