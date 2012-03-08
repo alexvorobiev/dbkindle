@@ -1,6 +1,11 @@
--*- org -*-
+* DBKindle -- a style package for Dblatex[fn:1]
+  DBKindle is designed to generate PDF documents optimized for e-readers:
+- No margins, page numbers, or page headers
+- Memoir document class for professional text layout
+- Advanced microtypography provided by Microtype package
+- Text flows around small figures
+** Installation
 
-* DBKindle -- a style package for Dblatex[fn:1] generating documents optimized for e-readers
 * Footnotes
 
 [fn:1] [[http://dblatex.sourceforge.net/][Dblatex]]
