@@ -13,9 +13,16 @@
    - Working Dblatex is required. See [[http://dblatex.sourceforge.net/doc/manual/sec-install.html]]
    - Create "specs" file for Dblatex or use sample kindle.specs. The file must be in Dblatex's share/latex/specs subdirectory
 ** Configuration
-   The style has many configuration settings in both xsl and tex files. Please browse the files and read the comments:
-   *** 
+   The style has many configuration settings in both xsl and tex files. Please browse the files and read the comments. The most important settings are in
+   - dbkindle_geometry.sty -- page dimensions
+   - dbkindle_font.sty -- base font selection
+   - param.xsl:18 -- base font size, all other fonts will be adjusted as well
+   - dbkindle_font.sty:90 -- size of base font only
+
 ** Usage
-   
+   #+begin_src shell
+   dblatex -T kindle book.xml
+   #+end_src
+
 ** Usage with FB2DocBook
 
