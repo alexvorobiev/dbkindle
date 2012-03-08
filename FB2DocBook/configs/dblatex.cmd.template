@@ -1,0 +1,5 @@
+@set XML_CATALOG_FILES=file:///${btransformer_base_quoted_cmd}/xml/catalog
+@set TEMP=${btransformer_base_quoted_cmd}/temp/
+@set CYGWIN=nodosfilewarning
+@set PATH=%PATH%;"${btransformer_base}"
+@"${btransformer_base}/py.exe" "${btransformer_base}/dblatex/dblatex" %1 %2 %3 %4 %5 %6 %7 %8 %9

@@ -1,0 +1,12 @@
+btconfig.xml.template:config/btconfig.xml
+btransformer.cmd.template:btransformer.cmd
+btransformer_tmp.cmd.template:btransformer_tmp.cmd
+btransformer_epub.cmd.template:btransformer_epub.cmd
+btransformer_help.cmd.template:btransformer_help.cmd
+btransformer_py.cmd.template:btransformer_py.cmd
+catalog.template:xml/catalog
+docbook.template:xml/docbook
+fop.conf.template:fop/conf/fop.conf
+pdfopt.cmd.template:gs/pdfopt.cmd
+dblatex.cmd.template:dblatex.cmd
+dblatex.template:dblatex/dblatex
