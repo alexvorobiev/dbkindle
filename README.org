@@ -1,0 +1,21 @@
+* DBKindle -- a style package for [[http://dblatex.sourceforge.net/][Dblatex]]
+  DBKindle is designed to generate PDF documents optimized for e-readers:
+- No margins, page numbers, or page headers
+- Memoir document class for professional text layout
+- Advanced microtypography provided by Microtype package
+- Wrapping text around small figures
+- Examples on configuring fonts and styles for section titles and bridgeheads
+- Mappings for many Unicode symbols
+- Cover page images for books
+- Dropped capitals for sections' beginnings
+
+** Installation
+   - Working Dblatex is required. See [[http://dblatex.sourceforge.net/doc/manual/sec-install.html]]
+   - Create "specs" file for Dblatex or use sample kindle.specs. The file must be in Dblatex's share/latex/specs subdirectory
+** Configuration
+   The style has many configuration settings in both xsl and tex files. Please browse the files and read the comments:
+   *** 
+** Usage
+   
+** Usage with FB2DocBook
+
