@@ -13,6 +13,12 @@
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template match="figure">
+    <xsl:call-template name="processimage">
+      <xsl:with-param name="image" select="./mediaobject/imageobject/imagedata/@fileref"/>
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template name="processimage">
     <xsl:param name="image" select="."/>
     <xsl:text>\wrapifneeded{</xsl:text><xsl:value-of select="$wrapimage.treshold"/>
