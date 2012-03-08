@@ -1,0 +1,6 @@
+-*- org -*-
+
+* DBKindle -- a style package for Dblatex[fn:1] generating documents optimized for e-readers
+* Footnotes
+
+[fn:1] [[http://dblatex.sourceforge.net/][Dblatex]]
