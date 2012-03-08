@@ -3,9 +3,14 @@
 - No margins, page numbers, or page headers
 - Memoir document class for professional text layout
 - Advanced microtypography provided by Microtype package
-- Text flows around small figures
-** Installation
+- Wrapping text around small figures
+- Examples on configuring fonts and styles for section titles and bridgeheads
+- Mappings for many Unicode symbols
+- Cover page images for books
 
+** Installation
+   - Working Dblatex is required. See [[http://dblatex.sourceforge.net/doc/manual/sec-install.html]]
+   - 
 * Footnotes
 
 [fn:1] [[http://dblatex.sourceforge.net/][Dblatex]]
