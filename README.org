@@ -7,6 +7,7 @@
 - Examples on configuring fonts and styles for section titles and bridgeheads
 - Mappings for many Unicode symbols
 - Cover page images for books
+- Dropped capitals for sections' beginnings
 
 ** Installation
    - Working Dblatex is required. See [[http://dblatex.sourceforge.net/doc/manual/sec-install.html]]
