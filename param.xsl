@@ -13,6 +13,7 @@
   <!-- Options used for documentclass -->
 
   <xsl:param name="latex.class.book">memoir</xsl:param> 
+  <xsl:param name="latex.class.article">memoir</xsl:param> 
 
   <xsl:param name="latex.class.options">12pt,oneside,showtrims</xsl:param>
 
@@ -98,4 +99,19 @@
   <xsl:template match="superscript[footnote]">
     <xsl:apply-templates select="./node()"/>
   </xsl:template>
+
+  <!-- Docbook's formalpara - dblatex's version fixed for memoir -->
+  <xsl:template match="formalpara">
+    <xsl:text>&#10;\textbf{ </xsl:text>
+    <xsl:call-template name="normalize-scape">
+      <xsl:with-param name="string" select="title"/>
+    </xsl:call-template>
+    <xsl:text>} </xsl:text>
+    <xsl:call-template name="label.id"/>
+    <xsl:apply-templates/>
+    <xsl:text>&#10;</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="formalpara/title"></xsl:template>
+
 </xsl:stylesheet>
