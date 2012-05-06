@@ -5,7 +5,7 @@
                 version='1.0'>
 
   <!-- Images narrower than this portion of line width will be surrounded by text -->
-  <xsl:param name="wrapimage.treshold">0.4</xsl:param> 
+  <xsl:param name="wrapimage.threshold">0.4</xsl:param> 
   
   <xsl:template match="mediaobject">
     <xsl:call-template name="processimage">
@@ -21,7 +21,7 @@
 
   <xsl:template name="processimage">
     <xsl:param name="image" select="."/>
-    <xsl:text>\wrapifneeded{</xsl:text><xsl:value-of select="$wrapimage.treshold"/>
+    <xsl:text>\wrapifneeded{</xsl:text><xsl:value-of select="$wrapimage.threshold"/>
     <xsl:text>}{</xsl:text><xsl:value-of select="$image"/><xsl:text>} %&#10;</xsl:text>
   </xsl:template>
 
