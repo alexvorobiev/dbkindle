@@ -1,4 +1,4 @@
-% Greek letters in unicode
+% Greek letters in Unicode
 \usepackage[noenc]{tipa}
 \usepackage{textcomp}
 %small letters
@@ -71,17 +71,17 @@
 % Old Russian letters
 
 \let\saveCYRYAT\CYRYAT % save old definition to prevent recursion
-\renewcommand\CYRYAT{\fontencoding{OT2}\selectfont\saveCYRYAT}
+\renewcommand\CYRYAT{{\fontencoding{OT2}\selectfont\saveCYRYAT}}
 \let\saveCYRFITA\CYRFITA
-\renewcommand\CYRFITA{\fontencoding{OT2}\selectfont\saveCYRFITA}
+\renewcommand\CYRFITA{{\fontencoding{OT2}\selectfont\saveCYRFITA}}
 \let\saveCYRIZH\CYRIZH
-\renewcommand\CYRIZH{\fontencoding{OT2}\selectfont\saveCYRIZH}
+\renewcommand\CYRIZH{{\fontencoding{OT2}\selectfont\saveCYRIZH}}
 \let\savecyryat\cyryat
-\renewcommand\cyryat{\fontencoding{OT2}\selectfont\savecyryat}
+\renewcommand\cyryat{{\fontencoding{OT2}\selectfont\savecyryat}}
 \let\savecyrfita\cyrfita
-\renewcommand\cyrfita{\fontencoding{OT2}\selectfont\savecyrfita}
+\renewcommand\cyrfita{{\fontencoding{OT2}\selectfont\savecyrfita}}
 \let\savecyrizh\cyrizh
-\renewcommand\cyrizh{\fontencoding{OT2}\selectfont\savecyrizh}
+\renewcommand\cyrizh{{\fontencoding{OT2}\selectfont\savecyrizh}}
 
 % Some control characters
 
