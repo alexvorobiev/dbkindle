@@ -1,8 +1,8 @@
 #
 # Dblatex spec file example
 #
-TexInputs: ../contrib/dbkindle//
+TexInputs: /home/alex/src/dbkindle//
 TexStyle:  dbkindle
 # keep the temp files
 Options:   -d
-XslParam: ../contrib/dbkindle/param.xsl
+XslParam: param.xsl

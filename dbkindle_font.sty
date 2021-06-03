@@ -1,13 +1,14 @@
 % Font setup
- 
+
 %Adobe Minion Pro
 %\usepackage[minionint,opticals,fullfamily,footnotefigures]{MinionPro}
-%\usepackage{MnSymbol} 
+%\usepackage{MnSymbol}
 %\figureversion{text,proportional}
 
+%% This doesn't work in lualatex
 % Make sure words with ligatures are searchable in PDF
-\input glyphtounicode
-\pdfgentounicode=1
+%% \input glyphtounicode
+%% \pdfgentounicode=1
 
 
 % PsCyr
@@ -36,7 +37,7 @@
 
 % Linotype Sabon
 % http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=1040
-%\usepackage[garamond]{mathdesign} 
+%\usepackage[garamond]{mathdesign}
 
 % New century schoolbook
 % http://forum.ru-board.com/topic.cgi?forum=5&topic=30211&start=0&limit=1&m=16#1
@@ -52,7 +53,10 @@
 % Cooper
 %\usepackage{CooperP}
 
-\usepackage[charter,expert]{mathdesign}
+%% \usepackage[charter,expert]{mathdesign}
+
+%% Alegreya
+\usepackage{Alegreya}
 
 % Libertine
 %\usepackage{libertine}
@@ -93,4 +97,3 @@
 % Font for the dropped capitals
 %% \renewcommand{\LettrineFontHook}{\fontfamily{antt}\fontshape{b}%
 %% }
-

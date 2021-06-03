@@ -5,16 +5,17 @@ import re
 import random
 import logging
 import subprocess
-from cStringIO import StringIO
+from io import StringIO, BytesIO
 import binascii
-import Image
-import ImageDraw
-import ImageFont
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 import xml.dom.minidom
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import zipfile, gzip, bz2
 import optparse
-import cssutils
+from lxml import etree
+#import cssutils
 
 VERSION = '0.1.bzr348'
 VERSION_XSLT = '0.1.bzr349'
@@ -27,15 +28,15 @@ has_translify = False
 try:
     import pytils
     from BeautifulSoup import BeautifulStoneSoup
-    def translify(s):        
+    def translify(s):
         try:
-            d = unicode(BeautifulStoneSoup(s, convertEntities = BeautifulStoneSoup.XML_ENTITIES))
+            d = str(BeautifulStoneSoup(s, convertEntities = BeautifulStoneSoup.XML_ENTITIES))
             d = pytils.translit.translify(d)
         except:
             d = s
         return d
     has_translify = True
-except ImportError, err: pass
+except ImportError as err: pass
 
 
 registred_processors = {}
@@ -43,14 +44,14 @@ registred_processors = {}
 to_xml_uri = lambda x: x
 
 def unix_to_xml_uri(x):
-    x = urllib.pathname2url(x)
+    x = urllib.request.pathname2url(x)
     return 'file://' + x
 
 def win32_to_xml_uri(x):
     if len(x) > 2 and x[1] == ':':
-        return 'file:///' + x[:2] + urllib.pathname2url(x[2:])
+        return 'file:///' + x[:2] + urllib.request.pathname2url(x[2:])
     else:
-        return 'file://' + urllib.pathname2url(x)
+        return 'file://' + urllib.request.pathname2url(x)
 
 if sys.platform == 'win32':
     to_xml_uri = win32_to_xml_uri
@@ -73,12 +74,12 @@ class PdfOptimizerException(Exception): pass
 class GSCommandException(PdfOptimizerException): pass
 
 def gen_tmp_name(prefix = '.fb2d'):
-    return '%s%012X' % (prefix, random.randint(0, 0xFFFFFFFFFFFFL))
+    return '%s%012X' % (prefix, random.randint(0, 0xFFFFFFFFFFFF))
 
 def import_module(mod_name, to_reload = False):
     ##todo: import module like mod.submod1.submod2.x.x
     module = None
-    if sys.modules.has_key(mod_name):
+    if mod_name in sys.modules:
         if to_reload:
             module = reload(sys.modules[mod_name])
             globals()[mod_name] = module
@@ -114,7 +115,7 @@ def get_param(root_node, *node_names):
             return get_param(node, *node_names[1:])
 
 def set_param(root_node, text, *node_names):
-    print root_node
+    print(root_node)
     if len(node_names) == 0:
         if len(root_node.childNodes) == 0: root_node.appendChild(xml.dom.minidom.Text())
         return setText(text, root_node.childNodes)
@@ -152,7 +153,7 @@ class MZipFile(zipfile.ZipFile):
         if compress_type == None: compress_type = zipfile.ZIP_DEFLATED
         for dirpath, dirnames, filenames in os.walk(fdir):
             arc_dir = dirpath[len(fdir):]
-            for filename in filenames:            
+            for filename in filenames:
                 self.write(os.path.join(dirpath, filename), '/'.join((adir, arc_dir, filename)), compress_type)
 
 class Options(object):
@@ -160,14 +161,14 @@ class Options(object):
         self._soup = None
         self.load(opts_fname)
 
-        self.image_transfrom = False        
+        self.image_transfrom = False
         self.thumb_type = Image.ANTIALIAS
         self.cnv_tmp_dir = tempfile.gettempdir()
 
     def load(self, opts_fname):
         finp = None
         try:
-            finp = file(opts_fname)
+            finp = open(opts_fname)
             self._soup = xml.dom.minidom.parse(finp)
         finally:
             if finp != None: finp.close()
@@ -176,7 +177,7 @@ class Options(object):
         ###add my exception, if _soup is None
         fout = None
         try:
-            fout = file(opts_fname, 'wb')
+            fout = open(opts_fname, 'wb')
             self._soup.writexml(fout)
         finally:
             if fout != None: fout.close()
@@ -187,14 +188,13 @@ class Options(object):
         return set_param(self._soup.documentElement, text, *params)
 
 class ProcessorMeta(type):
-    def __init__(cls, name, bases, ns):        
+    def __init__(cls, name, bases, ns):
         registred_processors[cls.get_reg_name()] = cls
 
-class XSLT_libxslt_exec(object):
-    __metaclass__ = ProcessorMeta
+class XSLT_libxslt_exec(object, metaclass=ProcessorMeta):
     retcodes = {1: 'No argument',
                 2: 'Too many parameters',
-                3: 'Unknown option', 
+                3: 'Unknown option',
                 4: 'Failed to parse the stylesheet',
                 5: 'Error in the stylesheet',
                 6: 'Error in one of the documents',
@@ -225,38 +225,46 @@ class XSLT_libxslt_exec(object):
         if retcode != 0:
             raise XSLTLibxsltCommandException('%s: %s' % (retcode, XSLT_libxslt_exec.retcodes.get(retcode, '')))
 
-class XSLT_libxslt_lib(object):
-    __metaclass__ = ProcessorMeta
+class XSLT_libxslt_lib(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'libxslt_lib'
     @staticmethod
     def use_type(): return 'lib'
     @staticmethod
     def get_document_element_type(): return 'exsl:document'
-    def __init__(self, options):
-        import_module('libxml2')
-        import_module('libxslt')
-    def transform(self, xslt_fname, fname_in, fname_out, params = tuple()):
+    # def __init__(self, options):
+        # import_module('lxml')
+    def transform(xslt_fname, fname_in, fname_out, params = tuple()):
         def mk_params_dict(params):
             res = {}
             for par in params: res[par[0]] = "'%s'" % (par[1], )
             if len(res) == 0: res = None
             return res
-        styledoc = libxml2.parseFile(xslt_fname)
+        print(xslt_fname)
+        styledoc = etree.parse(xslt_fname)
+
+
         style = doc = result = None
         try:
-            style = libxslt.parseStylesheetDoc(styledoc)
-            doc = libxml2.parseFile(fname_in)
+            transform = etree.XSLT(styledoc)
+            doc = etree.parse(fname_in)
             params_dict = mk_params_dict(params)
-            result = style.applyStylesheet(doc, params_dict)
-            style.saveResultToFilename(fname_out, result, 0)
+            print(params_dict)
+            if params_dict != None:
+                result = transform(doc, **params_dict)
+                result.write_output(fname_out)
+            else:
+                result = transform(doc)
+                print(fname_out)
+                result.write(fname_out)
+
+            # style.saveResultToFilename(fname_out, result, 0)
         finally:
             if style != None: style.freeStylesheet()
-            if doc != None: doc.freeDoc()
-            if result != None: result.freeDoc()
+            # if doc != None: doc.xmlFreeDoc()
+            # if result != None: result.xmlFreeDoc()
 
-class XSLT_4xslt_lib(object):
-    __metaclass__ = ProcessorMeta
+class XSLT_4xslt_lib(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return '4xslt_lib'
     @staticmethod
@@ -272,15 +280,14 @@ class XSLT_4xslt_lib(object):
             for par in params: res[par[0]] = par[1]
             if len(res) == 0: res = None
             return res
-        params_dict = mk_params_dict(params)        
-        fout = file(fname_out, 'wb')
+        params_dict = mk_params_dict(params)
+        fout = open(fname_out, 'wb')
         try:
             Ft.Xml.Xslt.Transform(fname_in, xslt_fname, params_dict, output=fout)
         finally:
             fout.close()
 
-class XSLT_xalan_exec(object):
-    __metaclass__ = ProcessorMeta
+class XSLT_xalan_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'xalan_bin'
     @staticmethod
@@ -305,8 +312,7 @@ class XSLT_xalan_exec(object):
         if retcode != 0:
             raise XSLTXalanCommandException(str(retcode))
 
-class XSLT_saxon6_exec(object):
-    __metaclass__ = ProcessorMeta
+class XSLT_saxon6_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'saxon6_bin'
     @staticmethod
@@ -329,8 +335,7 @@ class XSLT_saxon6_exec(object):
         if retcode != 0:
             raise XSLTSaxon6CommandException(str(retcode))
 
-class FO_fop_exec(object):
-    __metaclass__ = ProcessorMeta
+class FO_fop_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'fop_bin'
     @staticmethod
@@ -354,8 +359,7 @@ class FO_fop_exec(object):
         if retcode != 0:
             raise FOPCommandException(str(retcode))
 
-class LATEX_dblatex_exec(object):
-    __metaclass__ = ProcessorMeta
+class LATEX_dblatex_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'dblatex_bin'
     @staticmethod
@@ -371,14 +375,13 @@ class LATEX_dblatex_exec(object):
         args = [self._command, ]
         if self._dblatex_config: args += ['-T', self._dblatex_config]
         args += ['-o', pdf_fname, docbook_fname]
-        #logging.info(args)
+        logging.info(args)
         p = subprocess.Popen(args = args)
         retcode = p.wait()
         if retcode != 0:
             raise DBLATEXCommandException(str(retcode))
-        
-class FO_xep_exec(object):
-    __metaclass__ = ProcessorMeta
+
+class FO_xep_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'xep_bin'
     @staticmethod
@@ -388,15 +391,14 @@ class FO_xep_exec(object):
     @staticmethod
     def docbook_params(): return (('xep.extensions', '1'), )
     def transform(self, fo_fname, pdf_fname):
-        args = [self._command, ]        
+        args = [self._command, ]
         args += ['-fo', fo_fname, '-pdf', pdf_fname]
         p = subprocess.Popen(args = args)
         retcode = p.wait()
         if retcode != 0:
             raise XEPCommandException(str(retcode))
 
-class PdfTool_pdftk_exec(object):
-    __metaclass__ = ProcessorMeta
+class PdfTool_pdftk_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'pdftk_bin'
     @staticmethod
@@ -429,13 +431,13 @@ class PdfTool_pdftk_exec(object):
                     mts.append((node.tagName, getText(node.childNodes)))
             finp = fout = None
             try:
-                finp = file(in_dd_fname)
-                fout = file(out_dd_fname, 'wb')
+                finp = open(in_dd_fname)
+                fout = open(out_dd_fname, 'wb')
                 for mt in mts:
-                    s = 'InfoKey: %s\nInfoValue: %s\n' % tuple(map(lambda x: x.encode('ascii', 'xmlcharrefreplace'), mt))
+                    s = 'InfoKey: %s\nInfoValue: %s\n' % tuple([x.encode('ascii', 'xmlcharrefreplace') for x in mt])
                     fout.write(translify_fun(s))
                 for line in finp:
-                    fout.write(translify_fun(line))                
+                    fout.write(translify_fun(line))
             finally:
                 if finp != None: finp.close()
                 if fout != None: fout.close()
@@ -443,8 +445,7 @@ class PdfTool_pdftk_exec(object):
         write_new_metadata(soup_metadata, in_dd_fname, out_dd_fname, translify_fun)
         update_info(in_pdf_fname, out_pdf_fname, out_dd_fname)
 
-class PdfOptimizer_GS_exec(object):
-    __metaclass__ = ProcessorMeta
+class PdfOptimizer_GS_exec(object, metaclass=ProcessorMeta):
     @staticmethod
     def get_reg_name(): return 'gspdfopt_bin'
     @staticmethod
@@ -454,7 +455,7 @@ class PdfOptimizer_GS_exec(object):
         if command == None:
             self._command = options.option('pdf_optimizer', 'gspdfopt_bin', 'bin')
     def transform(self, inp_pdf_fname, out_pdf_fname):
-        args = [self._command, inp_pdf_fname, out_pdf_fname]        
+        args = [self._command, inp_pdf_fname, out_pdf_fname]
         p = subprocess.Popen(args = args)
         retcode = p.wait()
         if retcode != 0:
@@ -481,9 +482,9 @@ class Transformer(object):
         self._tmp_fnames.add(os.path.abspath(fname))
     def _transform_image(self, ascii_finp, bin_fout, image_name):
         try:
-            im = Image.open(StringIO(binascii.a2b_base64(ascii_finp.read())))
+            im = Image.open(BytesIO(binascii.a2b_base64(ascii_finp.read())))
             im_format = im.format
-        except IOError, err:
+        except IOError as err:
             logging.error('%s [broken image]', err)
             im = replace_broken_img(image_name)
             im_format = os.path.splitext(image_name)[1][1:]
@@ -504,7 +505,7 @@ class Transformer(object):
             if itrans == 2 or itrans == 3:
                 dpi = (dpi[0]/t_ratio, dpi[1]/t_ratio)
             else:
-                im.thumbnail(map(lambda x: int(x*t_ratio), im.size), self.options.thumb_type)
+                im.thumbnail([int(x*t_ratio) for x in im.size], self.options.thumb_type)
         if im.mode in ('RGBA', 'LA', 'P') or 'transparency' in im.info:
             im = im.convert("RGBA")
             if self.options.image_mode.lower() == 'bw':
@@ -548,18 +549,18 @@ class Transformer(object):
                         int(get_param(conv_info_soup.documentElement, 'page', 'dpi', 'height')))
             page_size = (get_param(conv_info_soup.documentElement, 'page', 'size', 'width'),
                          get_param(conv_info_soup.documentElement, 'page', 'size', 'height'))
-            self.options.page_size = tuple(map(lambda x: float(x[:-2]), page_size))
+            self.options.page_size = tuple([float(x[:-2]) for x in page_size])
             self.options.page_image_margin = (int(get_param(conv_info_soup.documentElement, 'page', 'max_image_margin', 'width')),
                                  int(get_param(conv_info_soup.documentElement, 'page', 'max_image_margin', 'height')))
             self.options.max_image_size = ((((self.options.page_size[0] - self.options.page_image_margin[0]*2)/25.4)*self.options.output_dpi[0],
-                ((self.options.page_size[1] - self.options.page_image_margin[1]*2)/25.4)*self.options.output_dpi[1]))            
+                ((self.options.page_size[1] - self.options.page_image_margin[1]*2)/25.4)*self.options.output_dpi[1]))
         for binary_node in findAll(conv_info_soup.documentElement.getElementsByTagName('binaries')[0], 'binary'):
             href_binary = binary_node.attributes['href_binary'].value
             href_ascii = binary_node.attributes['href_ascii'].value
             content_type = binary_node.attributes['content-type'].value
-            bin_fout = file(os.path.join(out_dir, href_binary), 'wb')
+            bin_fout = open(os.path.join(out_dir, href_binary), 'wb')
             self._add_tmp_fname(os.path.join(out_dir, href_binary))
-            ascii_finp = file(href_ascii)
+            ascii_finp = open(href_ascii)
             self._add_tmp_fname(href_ascii)
             try:
                 if self.options.image_transform != 0 and content_type.split('/')[0].lower() == 'image':
@@ -603,8 +604,8 @@ class Transformer(object):
             return inp_fb2_fname
         logging.info('file seems to be packed (has known packer extension)')
         try:
-            unp_inp_fb2_fname = os.path.join(self.trns_dir, name)        
-            fu = file(unp_inp_fb2_fname, 'wb')
+            unp_inp_fb2_fname = os.path.join(self.trns_dir, name)
+            fu = open(unp_inp_fb2_fname, 'wb')
             self._add_tmp_fname(unp_inp_fb2_fname)
             logging.info('unpacking file')
             unp_fun(inp_fb2_fname, fu)
@@ -616,16 +617,16 @@ class Transformer(object):
         self.trns_dir = os.path.abspath(os.path.join(self.options.cnv_tmp_dir, gen_tmp_name()))
         try:
             os.mkdir(self.trns_dir)
-        except OSError, err:
+        except OSError as err:
             if err.errno != 17: raise err
-    def transform_to_epub(self, fb2_fname, epub_fname):        
+    def transform_to_epub(self, fb2_fname, epub_fname):
         self._mk_trns_dir()
         oebps_fdir = 'OEBPS'
         metainf_fdir = 'META-INF'
         inp_fb2_fname = os.path.abspath(fb2_fname)
         inp_fb2_fname = self.unpack_try(inp_fb2_fname)
         out_epub_fname = os.path.abspath(epub_fname)
-        self.interim_name = os.path.split(inp_fb2_fname)[1]        
+        self.interim_name = os.path.split(inp_fb2_fname)[1]
         conv_info_fname = self.options.option('conv_info_fname')
         docbook_fname = self._transform_fb2_docbook(inp_fb2_fname, conv_info_fname)
         abs_conv_info_fname = os.path.abspath(os.path.join(self.trns_dir, conv_info_fname))
@@ -636,7 +637,7 @@ class Transformer(object):
         metainf_dir = os.path.join(self.trns_dir, metainf_fdir)
         self._add_tmp_fname(metainf_dir)
         for d in oebps_dir, metainf_dir: os.mkdir(d)
-        
+
         self._transform_binaries(conv_info_soup, oebps_dir)
 
         self._transform_docbook_epub(docbook_fname)
@@ -669,15 +670,17 @@ class Transformer(object):
         inp_fb2_fname = os.path.abspath(fb2_fname)
         inp_fb2_fname = self.unpack_try(inp_fb2_fname)
         out_pdf_fname = os.path.abspath(pdf_fname)
-        self.interim_name = os.path.split(inp_fb2_fname)[1]        
+        self.interim_name = os.path.split(inp_fb2_fname)[1]
         conv_info_fname = self.options.option('conv_info_fname')
         docbook_fname = self._transform_fb2_docbook(inp_fb2_fname, conv_info_fname)
-        abs_conv_info_fname = os.path.abspath(os.path.join(self.trns_dir, conv_info_fname))
+        print(self.trns_dir)
+        print(conv_info_fname)
+        abs_conv_info_fname = os.path.abspath(os.path.join(self.trns_dir, conv_info_fname.decode('UTF-8')))
         self._add_tmp_fname(abs_conv_info_fname)
         conv_info_soup = xml.dom.minidom.parse(abs_conv_info_fname)
         self._transform_binaries(conv_info_soup, self.trns_dir)
 
-        if options.option('docbook_pdf_proc') == 'latex_proc':
+        if options.option('docbook_pdf_proc') == b'latex_proc':
             latex_pdf_fname = self._transform_latex(docbook_fname)
             wf_pdf_fname = latex_pdf_fname
         else:
@@ -686,13 +689,13 @@ class Transformer(object):
             fo_pdf_fname = self._transform_fo(abs_fo_fname)
             wf_pdf_fname = fo_pdf_fname
 
-        if self.update_metadata:            
+        if self.update_metadata:
             upd_desc_pdf_fname = self._make_pdf_description(
                                     conv_info_soup.documentElement.getElementsByTagName('metadata')[0],
                                     wf_pdf_fname)
             self._add_tmp_fname(wf_pdf_fname)
             wf_pdf_fname = upd_desc_pdf_fname
-        if self.linearize_pdf:            
+        if self.linearize_pdf:
             optimzed_pdf_fname = self._pdf_optimize(wf_pdf_fname)
             self._add_tmp_fname(wf_pdf_fname)
             wf_pdf_fname = optimzed_pdf_fname
@@ -724,8 +727,8 @@ class Transformer(object):
             self.pdf_optimizer.transform(inp_pdf_fname, out_pdf_fname)
         finally:
             pass
-        return out_pdf_fname    
-    def _make_pdf_description(self, soup_metadata, in_pdf_fname):        
+        return out_pdf_fname
+    def _make_pdf_description(self, soup_metadata, in_pdf_fname):
         try:
             logging.info('updating pdf description')
             in_dd_fname = os.path.abspath(os.path.join(self.trns_dir, self.interim_name + '.inp.metadata'))
@@ -754,7 +757,7 @@ class Transformer(object):
         titlepages_fname = os.path.abspath(os.path.join(self.trns_dir,
                                                            os.path.split(titlepages_fname_inp)[1] + '.xsl'))
         xslt_trans = os.path.abspath(os.path.join(self.options.option('docbook', 'root'),
-                                                  self.options.option('docbook', 'titlepages_trans')))
+                                                  self.options.option('docbook', 'titlepages_trans'))).decode('UTF-8')
         self.xslt_transformer.transform(xslt_trans, titlepages_fname_inp, titlepages_fname)
         self._add_tmp_fname(titlepages_fname)
         return titlepages_fname
@@ -766,7 +769,7 @@ class Transformer(object):
             <xsl:import href="%s"/>
             <xsl:import href="%s"/>
 </xsl:stylesheet>"""
-            fout = file(fname, 'wb')
+            fout = open(fname, 'wb')
             try:
                 docbook_xslt = os.path.abspath(os.path.join(self.options.option('docbook', 'root'),
                                                             self.options.option('docbook', 'fo_trans')))
@@ -792,15 +795,15 @@ class Transformer(object):
             <xsl:import href="%s"/>
             <xsl:include href="%s"/>
 </xsl:stylesheet>"""
-            fout = file(fname, 'wb')
+            fout = open(fname, 'wb')
             try:
                 user_xslt = os.path.abspath(self.xslt_params)
                 script_xslt = os.path.abspath(os.path.join(self.options.option('fb2', 'root'),
                     self.options.option('fb2', 'docbook_trans')))
-                fout.write(content % (to_xml_uri(user_xslt), to_xml_uri(script_xslt)))
+                fout.write((content % (to_xml_uri(user_xslt), to_xml_uri(script_xslt))).encode())
             finally:
                 fout.close()
-        params = (('conv_info_idx', conv_info_idx_fname),
+        params = (('conv_info_idx', conv_info_idx_fname.decode("UTF-8")),
                   ('document-element', self.xslt_transformer.get_document_element_type()))
         try:
             logging.info('transforming FB2 to Docbook')
@@ -811,7 +814,7 @@ class Transformer(object):
             docbook_fname = os.path.abspath(self.interim_name + '.docbook')
             self.xslt_transformer.transform(trns_xslt_fname, inp_fb2_fname,
                                             docbook_fname, params)
-            self._add_tmp_fname(docbook_fname)
+            # self._add_tmp_fname(docbook_fname)
         finally:
             os.chdir(self.cur_dir)
         return docbook_fname
@@ -819,25 +822,25 @@ class Transformer(object):
         def cr_trns_f(fname):
             content = """<?xml version='1.0' encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.1">
-            <xsl:import href="%s"/>            
+            <xsl:import href="%s"/>
             <xsl:import href="%s"/>
             <xsl:param name="html.stylesheet" select="'%s'"/>
 </xsl:stylesheet>"""
-            fout = file(fname, 'wb')
+            fout = open(fname, 'wb')
             try:
                 docbook_xslt = os.path.abspath(os.path.join(self.options.option('docbook', 'root'),
                                                             self.options.option('docbook', 'epub_trans')))
                 user_xslt = os.path.abspath(self.xslt_params)
                 stylesheet_fname = os.path.split(self.options.option('epub', 'stylesheet'))[1]
-                fout.write(content % (to_xml_uri(docbook_xslt), to_xml_uri(user_xslt), stylesheet_fname))
+                fout.write((content % (to_xml_uri(docbook_xslt), to_xml_uri(user_xslt), stylesheet_fname)).encode())
             finally:
                 fout.close()
         logging.info('transforming Docbook to Epub XHTMLs')
         trns_xslt_fname = os.path.abspath(os.path.join(self.trns_dir, 'trns_docbook_epub.xsl'))
         cr_trns_f(trns_xslt_fname)
         self._add_tmp_fname(trns_xslt_fname)
-        try:            
-            os.chdir(self.trns_dir)            
+        try:
+            os.chdir(self.trns_dir)
             self.xslt_transformer.transform(trns_xslt_fname,
                                         docbook_fname,
                                         'out')
@@ -886,16 +889,16 @@ class Transformer(object):
                     fdirs.append(fn)
                 else:
                     os.unlink(fn)
-            except Exception, err:
+            except Exception as err:
                 logging.error('Error %s while unlinking file: %s', err, fn)
         for fdir in fdirs:
             try:
                 rec_rmdir(fdir)
-            except Exception, err:
+            except Exception as err:
                 logging.error('Error %s while recursively unlink directory: %s', err, fdir)
         try:
             os.rmdir(self.trns_dir)
-        except Exception, err:
+        except Exception as err:
             logging.error('Error %s while removing directory: %s', err, self.trns_dir)
 
 def setup_logger():
@@ -914,9 +917,9 @@ def get_fname_with_ext(fb2_fname, ext):
 if __name__ == '__main__':
     setup_logger()
     prog_cwd = os.path.dirname(sys.argv[0])
-    cur_cwd = os.getcwd()    
+    cur_cwd = os.getcwd()
     cl_parser = optparse.OptionParser(usage = 'usage: %prog --config config_file [options] fb2_file[.(zip|gz|bz2)] output_file',
-                             version = '%s version %s; fb2docbook.xsl version %s' % ('%prog', VERSION, VERSION_XSLT))    
+                             version = '%s version %s; fb2docbook.xsl version %s' % ('%prog', VERSION, VERSION_XSLT))
     cl_parser.add_option('-c', '--config', dest = 'configname',
                   help = 'read config from FILE', metavar = 'FILE')
     cl_parser.add_option('--epub', action='store_true', default=False, dest='to_epub',
@@ -951,7 +954,7 @@ if __name__ == '__main__':
     if cl_options.win32hack:
         import atexit, msvcrt
         def getch():
-            print 'Press any key...'
+            print('Press any key...')
             msvcrt.getch()
         atexit.register(getch)
 
@@ -983,7 +986,7 @@ if __name__ == '__main__':
     if not cl_options.latex_proc:
         latex_proc_name = options.option('latex_proc', 'default')
     else:
-        latex_proc_name = cl_options.latex_proc    
+        latex_proc_name = cl_options.latex_proc
     if not cl_options.pdf_proc:
         pdf_proc_name = options.option('pdf_proc', 'default')
     else:
@@ -993,15 +996,15 @@ if __name__ == '__main__':
     else:
         pdf_optimizer_name = cl_options.pdf_optimizer
 
-    xslt_proc = registred_processors[xslt_proc_name](options)    
-    fo_proc = registred_processors[fo_proc_name](options)
-    latex_proc = registred_processors[latex_proc_name](options)    
-    pdf_proc = registred_processors[pdf_proc_name](options)
-    pdf_optimizer = registred_processors[pdf_optimizer_name](options)
+    xslt_proc = registred_processors[xslt_proc_name.decode('UTF-8')]
+    fo_proc = registred_processors[fo_proc_name.decode('UTF-8')](options)
+    latex_proc = registred_processors[latex_proc_name.decode('UTF-8')](options)
+    pdf_proc = registred_processors[pdf_proc_name.decode('UTF-8')](options)
+    pdf_optimizer = registred_processors[pdf_optimizer_name.decode('UTF-8')](options)
 
     logging.info('using xslt_proc: %s; fo_proc: %s; pdf_proc: %s, pdf_optimizer: %s',
                  xslt_proc_name, fo_proc_name, pdf_proc_name, pdf_optimizer_name)
-        
+
 
     if not cl_options.xslt_params:
         if cl_options.to_epub:
@@ -1018,7 +1021,7 @@ if __name__ == '__main__':
 
     trns = Transformer(options, xslt_proc, fo_proc, latex_proc,
                        pdf_proc, pdf_optimizer,
-                       xslt_params, xslt_titlepages,
+                       xslt_params, xslt_titlepages.decode('UTF-8'),
                        update_metadata = cl_options.update_metadata,
                        linearize_pdf = cl_options.linearize_pdf,
                        to_translify = has_translify and cl_options.to_translify)
@@ -1032,4 +1035,3 @@ if __name__ == '__main__':
             logging.info('removing temporary files')
             trns.rm_tmp_files()
     logging.info('finish')
-

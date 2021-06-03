@@ -9,11 +9,11 @@
   <xsl:import href="xsl/poem.xsl"/>
   <xsl:import href="xsl/epigraph.xsl"/>
   <xsl:import href="xsl/image.xsl"/>
-  
+
   <!-- Options used for documentclass -->
 
-  <xsl:param name="latex.class.book">memoir</xsl:param> 
-  <xsl:param name="latex.class.article">memoir</xsl:param> 
+  <xsl:param name="latex.class.book">memoir</xsl:param>
+  <xsl:param name="latex.class.article">memoir</xsl:param>
 
   <xsl:param name="latex.class.options">12pt,oneside,showtrims</xsl:param>
 
@@ -44,13 +44,13 @@
         <xsl:text>\usepackage[T1,T2A]{fontenc}&#10;</xsl:text>
         <!-- <xsl:text>\usepackage[latin1]{inputenc}&#10;</xsl:text> -->
         <xsl:text>\usepackage{ucs}&#10;</xsl:text>
-        <xsl:text>\usepackage[utf8x]{inputenc}&#10;</xsl:text>
+        <xsl:text>\usepackage[utf8]{inputenc}&#10;</xsl:text>
         <xsl:text>\usepackage[russian,greek,english]{babel}&#10;</xsl:text>
       </xsl:when>
       <xsl:when test="$latex.encoding='utf8'">
         <xsl:text>\usepackage[T3,OT2,T2A,T1]{fontenc}&#10;</xsl:text>
         <xsl:text>\usepackage{ucs}&#10;</xsl:text>
-        <xsl:text>\usepackage[utf8x]{inputenc}&#10;</xsl:text>
+        <xsl:text>\usepackage[utf8]{inputenc}&#10;</xsl:text>
         <xsl:text>\def\hyperparamadd{unicode=true}&#10;</xsl:text>
 
         <!-- Settings specific for Russian -->

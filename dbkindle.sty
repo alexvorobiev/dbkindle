@@ -146,7 +146,7 @@
 
 %% \usepackage[pdftex]{pict2e}
 
-%% \newcommand*\cornerCrop{% 
+%% \newcommand*\cornerCrop{%
 %%   \begin{picture}(0,0)
 %%     \unitlength1pt
 %%     \put(0,0){\color{light-gray}\circle*{1}}
@@ -202,7 +202,7 @@
 %\usepackage[Sonny]{fncychap}
 
 % Fancy breaks
-% Lists of available symbols: 
+% Lists of available symbols:
 % http://willbenton.com/wb-images/pifont.pdf
 % http://mirror.unl.edu/ctan/fonts/fourier-GUT/doc/latex/fourier/fourier-orns.pdf
 \usepackage{fourier-orns}
@@ -224,8 +224,10 @@
 \usepackage{ellipsis} % make ellipsis look nicer
 %\renewcommand{\ldots}{\textellipsis}
 
+\usepackage{bookmark}
+
+%% not needed for lualatex
 \usepackage{dbkindle_unicode}
 \usepackage{dbkindle_title}
 \usepackage{dbkindle_verbatim}
 \usepackage{dbkindle_graphics}
-

@@ -1,0 +1,80 @@
+
+    <!-- Формирование информации по книге для колонтитулов -->
+    <xsl:template name="fh_author">
+        <xsl:choose>
+            <xsl:when test="count(othername) and count(firstname) = 0">
+                <xsl:value-of select="othername"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="firstname"/>
+                <xsl:if test="count(lineage)">
+                    <xsl:text> </xsl:text>
+                    <xsl:value-of select="lineage"/>
+                </xsl:if>
+                <xsl:text> </xsl:text>
+                <xsl:value-of select="surname"/>
+                <xsl:if test="count(othername)">
+                    <xsl:text> &quot;</xsl:text>
+                    <xsl:value-of select="othername"/>
+                    <xsl:text>&quot;</xsl:text>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="fh_authors">
+        <xsl:choose>
+            <xsl:when test="count(ancestor-or-self::book/bookinfo/author)">
+                <xsl:for-each select="ancestor-or-self::book/bookinfo/author[position() = 1]">
+                    <xsl:call-template name="fh_author"/>
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="count(ancestor-or-self::book/bookinfo/authorgroup)">
+                <xsl:for-each select="ancestor-or-self::book/bookinfo/authorgroup/author[position() = 1]">
+                    <xsl:call-template name="fh_author"/>
+                </xsl:for-each>
+                <xsl:for-each select="ancestor-or-self::book/bookinfo/authorgroup/author[position() = 2]">
+                    <xsl:text xml:space="preserve">; </xsl:text>
+                    <xsl:call-template name="fh_author"/>
+                </xsl:for-each>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- Нижний колонтитул с автором, книгой и страницей -->
+    <xsl:template name="footer.content">
+        <xsl:param name="pageclass" select="''"/>
+        <xsl:param name="sequence" select="''"/>
+        <xsl:param name="position" select="''"/>
+        <xsl:param name="gentext-key" select="''"/>
+        <xsl:attribute name="font-size">
+            <xsl:value-of select="4"/>
+        </xsl:attribute>
+        <xsl:attribute name="font-family">
+            <xsl:value-of select="$title.fontset"/>
+        </xsl:attribute>
+        <xsl:variable name="candidate">
+            <xsl:choose>
+                <xsl:when test="$sequence = 'odd' and $position = 'left'">
+                    <xsl:value-of select="ancestor-or-self::book/bookinfo/title"/>
+                </xsl:when>
+                <xsl:when test="$sequence = 'odd' and $position = 'right'">
+                    <xsl:call-template name="fh_authors"/>
+                </xsl:when>
+                <xsl:when test="$sequence = 'even' and $position = 'right'">
+                    <xsl:value-of select="ancestor-or-self::book/bookinfo/title"/>
+                </xsl:when>
+                <xsl:when test="$sequence = 'even' and $position = 'left'">
+                    <xsl:call-template name="fh_authors"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="$sequence='blank' and $headers.on.blank.pages=0">
+                <xsl:copy-of select="$candidate"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$candidate"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
